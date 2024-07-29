@@ -22,31 +22,17 @@ def install_script():
     elif is_command_available('zypper'):
         os.system("zypper in arch-install-scripts")
 
-install_script()
-if not os.path.exists("/etc/podspawn"):
-    os.mkdir("/etc/podspawn")
-if not os.path.exists("/etc/podspawn/arch"):
-    os.mkdir("/etc/podspawn/arch")
-elif os.path.exists("/etc/podspawn/fedora"):
-    print("Podspawn/Fedora is already installed.")
-    sys.exit()
+def install_arch():
+    install_script()
+    os.mkdir("/etc/nspawnbox/arch")
 
-print("Bootstrapping Arch...")
-os.system("pacstrap -K /etc/podspawn/arch base-devel base git")
-print("Setting up nspawn container...")
-print("Please set your password")
-os.system("systemd-nspawn -D /etc/podspawn/arch /bin/passwd")
+    print("Arch not installed, installing...")
+    print("Bootstrapping Arch...")
+    os.system("pacstrap -K /etc/nspawnbox/arch base-devel base git")
+    print("Setting up nspawn container...")
+    os.system("echo 'DISPLAY=:0' > /etc/nspawnbox/arch/etc/environment")
+    os.system("systemd-nspawn -D /etc/nspawnbox/arch /bin/passwd")
 
-print("Making command...")
-with open("/usr/bin/podspawn.arch", "w+") as f:
-    f.writelines("""#!/bin/bash
-sudo systemd-nspawn -b -D /etc/podspawn/arch
-""")
-    
-os.system("sudo chmod +x /usr/bin/podspawn.arch")
-
-print("Podspawn/Arch installed.")
-print("Run 'podspawn.arch' to load Podspawn/Arch")
 
 
 
